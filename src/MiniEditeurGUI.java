@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.HashSet;
-import java.util.Set;
 
 public class MiniEditeurGUI extends JFrame {
     private Buffer buffer = new Buffer();
@@ -16,24 +14,13 @@ public class MiniEditeurGUI extends JFrame {
     private JTextField inputField;
     private JLabel actionLabel; // Label pour les actions effectuées
 
-    // Ensemble contenant les commandes
-    private Set<String> commandes;
-
     public MiniEditeurGUI() {
         commands = new Commands(buffer, clipboardManager, selection);
-
-        // Initialisation des commandes valides
-        commandes = new HashSet<>();
-        commandes.add("!select");
-        commandes.add("!copy");
-        commandes.add("!cut");
-        commandes.add("!paste");
-        commandes.add("!delete");
-        commandes.add("!exit");
 
         // Configuration de la fenêtre
         setTitle("Esir Editor");
         setSize(600, 400);
+        setMinimumSize(new Dimension(400, 300)); // Taille minimum de la fenêtre
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -46,7 +33,21 @@ public class MiniEditeurGUI extends JFrame {
         logArea = new JTextArea();
         logArea.setEditable(false);
         logArea.setBackground(Color.LIGHT_GRAY);
-        add(new JScrollPane(logArea), BorderLayout.EAST);
+        // add(new JScrollPane(logArea), BorderLayout.EAST);
+        logArea.setLineWrap(true); // Activer le retour à la ligne
+
+        // // Définir une taille préférée pour le logArea
+        // logArea.setPreferredSize(new Dimension(200, 0)); // Largeur de 200 pixels
+
+        // // Ajouter la zone de log dans un JScrollPane
+        // add(new JScrollPane(logArea), BorderLayout.EAST);
+        
+        // Ajouter la zone de log dans un JScrollPane
+        JScrollPane logScrollPane = new JScrollPane(logArea);
+        logScrollPane.setPreferredSize(new Dimension(200, 0)); // Largeur de 200 pixels
+        logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        add(logScrollPane, BorderLayout.EAST);
 
         // Champ de saisie pour les commandes et le texte
         inputField = new JTextField();
@@ -65,35 +66,16 @@ public class MiniEditeurGUI extends JFrame {
                     inputField.setText(""); // Effacer le champ de saisie
 
                     if (!input.isEmpty()) {
-                        if (isCommand(input)) {
+                        // traiter l'input
+                        commands.executeCommand(input, logArea);
 
-                            if (input.equals("!exit")) {// fermer l'editeur
-                                logArea.append("Fermeture de l'éditeur.\n");
-                                System.exit(0);
-                            }
-
-                            commands.executeCommand(input, logArea);
-                            actionLabel.setText("Commande exécutée : \"" + input + "\"");
-                        } else {
-                            buffer.append(input); // Ajouter du texte au buffer
-                            logArea.append("Texte ajouté :\n" + input + "\n");
-                            actionLabel.setText("Texte ajouté : \"" + input + "\"");
-                        }
+                        // Mettre à jour la zone de texte avec le contenu du buffer
+                        textArea.setText(buffer.getText());
+                        System.out.println(buffer.getText());
                     }
-
-                    // Mettre à jour la zone de texte avec le contenu du buffer
-                    textArea.setText(buffer.getText());
                 }
             }
         });
-    }
-
-    // Méthode pour vérifier si l'input est une commande
-    private boolean isCommand(String input) {
-        if (input.startsWith("!select ")) {
-            return true;
-        }
-        return commandes.contains(input);
     }
 
     public static void main(String[] args) {

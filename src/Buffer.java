@@ -23,4 +23,8 @@ public class Buffer {
             text.insert(index, str);
         }
     }
+
+    public void setText(String newText) {
+        text = new StringBuilder(newText); // Permet de réinitialiser le texte
+    }
 }
