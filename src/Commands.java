@@ -28,11 +28,12 @@ public class Commands {
 
             // Afficher le texte sélectionné dans la zone de log
             String selectedText = selection.getSelectedText(buffer.getText());
-            logArea.append("Texte sélectionné : \"" + selectedText + "\"\n");
+            logArea.append("Texte sélectionné : \n\"" + selectedText + "\"\n");
 
         } else if (input.equals("!copy")) { // 3: copie dans presse papier
             String selectedText = selection.getSelectedText(buffer.getText());
             clipboardManager.copy(selectedText);
+            logArea.append("Texte copié : \n\"" + selectedText + "\"\n");
             System.out.println("Texte copié : " + selectedText);
             selection.setSelection(-1, -1); // reset le select
 
@@ -42,8 +43,10 @@ public class Commands {
             if (selectedText != "") { // si du texte a bien été selectionné
                 clipboardManager.copy(selectedText);
                 buffer.delete(selection.getStart(), selection.getEnd());
+                logArea.append("Texte coupé : \n\"" + selectedText + "\"\n");
                 System.out.println("Texte coupé : " + selectedText);
             } else {
+                logArea.append("Rien n'a été sélectionné.");
                 System.out.println("Rien n'a été sélectionné.");
             }
 
@@ -60,9 +63,9 @@ public class Commands {
                 buffer.appendAt(selection.getStart(), textToPaste); // Coller à l'endroit sélectionné
 
             } else {
-                System.out.println(buffer.getText().length() - 1);
                 buffer.appendAt(-1, textToPaste); // ajoute a la suite
             }
+            logArea.append("Texte collé : \n\"" + textToPaste + "\"\n");
             System.out.println("Texte collé : " + textToPaste);
             selection.setSelection(-1, -1); // reset le select
 
@@ -72,14 +75,17 @@ public class Commands {
             if (selectedText != "") { // si du texte a bien été selectionné
                 buffer.delete(selection.getStart(), selection.getEnd());
                 System.out.println("Texte supprimé : " + selectedText);
+                logArea.append("Texte supprimé : \n\"" + selectedText + "\"\n");
             } else {
                 System.out.println("Rien n'a été sélectionné.");
+                logArea.append("Rien n'a été sélectionné.");
             }
 
             selection.setSelection(-1, -1); // reset le select
 
         } else if (input.equals("!exit")) { // quitter l'éditeur
             System.out.println("Fermeture de l'éditeur.");
+            logArea.append("Fermeture de l'éditeur.");
             System.exit(0);
 
         } else {

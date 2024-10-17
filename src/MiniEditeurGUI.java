@@ -76,7 +76,7 @@ public class MiniEditeurGUI extends JFrame {
                             actionLabel.setText("Commande exécutée : \"" + input + "\"");
                         } else {
                             buffer.append(input); // Ajouter du texte au buffer
-                            logArea.append("Texte ajouté : " + input + "\n");
+                            logArea.append("Texte ajouté :\n" + input + "\n");
                             actionLabel.setText("Texte ajouté : \"" + input + "\"");
                         }
                     }
