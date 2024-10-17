@@ -7,10 +7,20 @@ public class Buffer {
     }
 
     public void delete(int start, int end) {
-        text.delete(start, end);
+        if (!(start < 0 || end > text.length())) {
+            text.delete(start, end);
+        }
     }
 
     public String getText() {
         return text.toString();
+    }
+
+    public void appendAt(int index, String str) {
+        if (index == -1) {
+            text.append(str);
+        } else {
+            text.insert(index, str);
+        }
     }
 }

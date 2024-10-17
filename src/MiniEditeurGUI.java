@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MiniEditeurGUI extends JFrame {
     private Buffer buffer = new Buffer();
@@ -14,9 +16,21 @@ public class MiniEditeurGUI extends JFrame {
     private JTextField inputField;
     private JLabel actionLabel; // Label pour les actions effectuées
 
+    // Ensemble contenant les commandes
+    private Set<String> commandes;
+
     public MiniEditeurGUI() {
         commands = new Commands(buffer, clipboardManager, selection);
-        
+
+        // Initialisation des commandes valides
+        commandes = new HashSet<>();
+        commandes.add("!select");
+        commandes.add("!copy");
+        commandes.add("!cut");
+        commandes.add("!paste");
+        commandes.add("!delete");
+        commandes.add("!exit");
+
         // Configuration de la fenêtre
         setTitle("Esir Editor");
         setSize(600, 400);
@@ -50,25 +64,21 @@ public class MiniEditeurGUI extends JFrame {
                     String input = inputField.getText().trim(); // Effacer les espaces superflus
                     inputField.setText(""); // Effacer le champ de saisie
 
-                    // Traiter uniquement le texte saisi
                     if (!input.isEmpty()) {
-                        if (!input.startsWith("!select ") && !input.equals("!copy") && 
-                            !input.equals("!cut") && !input.equals("!paste") && 
-                            !input.equals("!exit")) {
-                            buffer.append(input); // Ajouter le texte au buffer
-                            logArea.append("Texte ajouté : " + input + "\n"); // Ajouter log
-                            actionLabel.setText("Texte ajouté : \"" + input + "\""); // Mettre à jour le label
-                        } else {
-                            commands.executeCommand(input); // Exécuter la commande
-                            logArea.append("Commande exécutée : " + input + "\n"); // Ajouter log
-                            actionLabel.setText("Commande exécutée : \"" + input + "\""); // Mettre à jour le label
-                        }
-                    }
+                        if (isCommand(input)) {
 
-                    // Quitter l'application si l'utilisateur entre "exit"
-                    if (input.equals("!exit")) {
-                        logArea.append("Fermeture de l'éditeur.\n");
-                        System.exit(0);
+                            if (input.equals("!exit")) {// fermer l'editeur
+                                logArea.append("Fermeture de l'éditeur.\n");
+                                System.exit(0);
+                            }
+
+                            commands.executeCommand(input, logArea);
+                            actionLabel.setText("Commande exécutée : \"" + input + "\"");
+                        } else {
+                            buffer.append(input); // Ajouter du texte au buffer
+                            logArea.append("Texte ajouté : " + input + "\n");
+                            actionLabel.setText("Texte ajouté : \"" + input + "\"");
+                        }
                     }
 
                     // Mettre à jour la zone de texte avec le contenu du buffer
@@ -76,6 +86,14 @@ public class MiniEditeurGUI extends JFrame {
                 }
             }
         });
+    }
+
+    // Méthode pour vérifier si l'input est une commande
+    private boolean isCommand(String input) {
+        if (input.startsWith("!select ")) {
+            return true;
+        }
+        return commandes.contains(input);
     }
 
     public static void main(String[] args) {
